@@ -18,3 +18,5 @@
 ..\obj\main.o: ..\HARDWARE\OLED\bmp.h
 ..\obj\main.o: ..\HARDWARE\KEY\key.h
 ..\obj\main.o: ..\HARDWARE\EXTI\exti.h
+..\obj\main.o: ..\SYSTEM\usart\usart.h
+..\obj\main.o: D:\software\keil525\ARM\ARMCC\Bin\..\include\stdio.h

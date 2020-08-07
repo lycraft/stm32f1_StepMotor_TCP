@@ -1,5 +1,5 @@
 Dependencies for Project 'OLED', Target 'Target 1': (DO NOT MODIFY !)
-F (.\main.c)(0x5F2D3CA1)(-c --cpu Cortex-M3 -g -O0 --apcs=interwork -I ..\SYSTEM\delay -I ..\SYSTEM\usart -I ..\USER -I ..\STM32F10x_FWLib\inc -I ..\CORE -I ..\HARDWARE\KEY -I ..\HARDWARE\OLED -I ..\HARDWARE\IIC -I ..\SYSTEM\sys -I ..\HARDWARE\EXTI-I.\RTE\_Target_1-ID:\software\keil525\ARM\PACK\ARM\CMSIS\5.3.0\CMSIS\Include-ID:\software\keil525\ARM\PACK\Keil\STM32F1xx_DFP\2.2.0\Device\Include-D__UVISION_VERSION="525" -D_RTE_ -DSTM32F10X_MD -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o ..\obj\main.o --omf_browse ..\obj\main.crf --depend ..\obj\main.d)
+F (.\main.c)(0x5F2D4AE2)(-c --cpu Cortex-M3 -g -O0 --apcs=interwork -I ..\SYSTEM\delay -I ..\SYSTEM\usart -I ..\USER -I ..\STM32F10x_FWLib\inc -I ..\CORE -I ..\HARDWARE\KEY -I ..\HARDWARE\OLED -I ..\HARDWARE\IIC -I ..\SYSTEM\sys -I ..\HARDWARE\EXTI-I.\RTE\_Target_1-ID:\software\keil525\ARM\PACK\ARM\CMSIS\5.3.0\CMSIS\Include-ID:\software\keil525\ARM\PACK\Keil\STM32F1xx_DFP\2.2.0\Device\Include-D__UVISION_VERSION="525" -D_RTE_ -DSTM32F10X_MD -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o ..\obj\main.o --omf_browse ..\obj\main.crf --depend ..\obj\main.d)
 I (..\SYSTEM\delay\delay.h)(0x5F2B5062)
 I (..\SYSTEM\sys\sys.h)(0x5F2B5062)
 I (..\USER\stm32f10x.h)(0x5F2B5062)
@@ -18,6 +18,8 @@ I (D:\software\keil525\ARM\ARMCC\include\stdlib.h)(0x599ECD2C)
 I (..\HARDWARE\OLED\bmp.h)(0x5F2D31FE)
 I (..\HARDWARE\KEY\key.h)(0x5F2B5062)
 I (..\HARDWARE\EXTI\exti.h)(0x5F2B5062)
+I (..\SYSTEM\usart\usart.h)(0x5F2B5062)
+I (D:\software\keil525\ARM\ARMCC\include\stdio.h)(0x599ECD2C)
 F (.\stm32f10x_it.c)(0x5F2B5062)(-c --cpu Cortex-M3 -g -O0 --apcs=interwork -I ..\SYSTEM\delay -I ..\SYSTEM\usart -I ..\USER -I ..\STM32F10x_FWLib\inc -I ..\CORE -I ..\HARDWARE\KEY -I ..\HARDWARE\OLED -I ..\HARDWARE\IIC -I ..\SYSTEM\sys -I ..\HARDWARE\EXTI-I.\RTE\_Target_1-ID:\software\keil525\ARM\PACK\ARM\CMSIS\5.3.0\CMSIS\Include-ID:\software\keil525\ARM\PACK\Keil\STM32F1xx_DFP\2.2.0\Device\Include-D__UVISION_VERSION="525" -D_RTE_ -DSTM32F10X_MD -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o ..\obj\stm32f10x_it.o --omf_browse ..\obj\stm32f10x_it.crf --depend ..\obj\stm32f10x_it.d)
 I (stm32f10x_it.h)(0x5F2B5062)
 I (stm32f10x.h)(0x5F2B5062)

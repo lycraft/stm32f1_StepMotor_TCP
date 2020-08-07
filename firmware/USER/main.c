@@ -19,6 +19,7 @@
 #include "bmp.h"
 #include "key.h"
 #include "exti.h" 
+#include "usart.h"
 
 int sa=0,sb=0,sc=0,sd=0;
 int wendu,shidu;
@@ -51,7 +52,7 @@ void meau()//主界面
 		OLED_DrawBMP(96,0,128,2,BMP2);	
 		OLED_ShowString(0,6,"Meau");
 		OLED_ShowString(40,0,"PWM");
-		OLED_ShowString(40,2,"ADC");
+		OLED_ShowString(40,2,"USART");
 		OLED_ShowString(40,4,"others");
 		OLED_ShowString(72,6,"Lycraft");
 }
@@ -74,11 +75,15 @@ void voltage1()//ADC界面不刷新的
 int main(void)
  {	
 		vu8 key=0;
+	 	u16 len;	
+		u16 times=0;
+	  u16 t; 
 	 
 		delay_init();	    	 //延时函数初始化	  
 		NVIC_Configuration(); 	 //设置NVIC中断分组2:2位抢占优先级，2位响应优先级 	
 		OLED_Init();			//初始化OLED  
 //		KEY_Init();          //初始化与按键连接的硬件接口
+	 	uart_init(115200);	 //串口初始化为115200
 		EXTIX_Init();
 		
 	 
@@ -120,7 +125,29 @@ int main(void)
 				voltage1();
 				flag--;
 			}
-
+				if(USART_RX_STA&0x8000)
+		{					   
+			len=USART_RX_STA&0x3fff;//得到此次接收到的数据长度
+			printf("\r\n您发送的消息为:\r\n\r\n");
+			for(t=0;t<len;t++)
+			{
+				USART_SendData(USART1, USART_RX_BUF[t]);//向串口1发送数据
+				while(USART_GetFlagStatus(USART1,USART_FLAG_TC)!=SET);//等待发送结束
+			}
+			printf("\r\n\r\n");//插入换行
+			USART_RX_STA=0;
+		}else
+		{
+			times++;
+			if(times%5000==0)
+			{
+				printf("\r\n战舰STM32开发板 串口实验\r\n");
+				printf("正点原子@ALIENTEK\r\n\r\n");
+			}
+			if(times%200==0)printf("请输入数据,以回车键结束\n");  
+//			if(times%30==0)LED0=!LED0;//闪烁LED,提示系统正在运行.
+			delay_ms(10);   
+		}
 			
 			
 		}	
