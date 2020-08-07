@@ -1,5 +1,5 @@
 ..\obj\hdc1080.o: ..\HARDWARE\HDC1080\HDC1080.c
-..\obj\hdc1080.o: D:\software\keil\ARM\ARMCC\Bin\..\include\stdint.h
+..\obj\hdc1080.o: D:\software\keil525\ARM\ARMCC\Bin\..\include\stdint.h
 ..\obj\hdc1080.o: ..\HARDWARE\HDC1080\HDC1080.h
 ..\obj\hdc1080.o: ..\SYSTEM\sys\sys.h
 ..\obj\hdc1080.o: ..\USER\stm32f10x.h
