@@ -20,9 +20,9 @@
 #include "key.h"
 #include "exti.h" 
 #include "usart.h"
+#include "timer.h"
 
 int sa=0,sb=0,sc=0,sd=0;
-int wendu,shidu;
 uint8_t modetemp = 6,mode = 4;//modetemp是指示位置 指向选中的mode，==============mode0-4
 uint8_t flag = 1;
 
@@ -32,17 +32,14 @@ void measure1()//mode1屏幕不刷新的东西
 		OLED_Clear();
 	
 		OLED_ShowString(0,2,"PWM1:");
+		OLED_ShowString(41,2,"100");
+		OLED_ShowString(73,2,"hz");
 	
 		OLED_ShowString(0,4,"PWM2:");
-
+		OLED_ShowString(41,4,"1.1k");
+		OLED_ShowString(73,4,"hz");
 	 
-	 	OLED_ShowCHinese(0,6,0);
-		OLED_ShowCHinese(18,6,1);
-		OLED_ShowCHinese(36,6,2);//的
-		OLED_ShowCHinese(54,6,3);//迷
-		OLED_ShowCHinese(72,6,4);//你
-		OLED_ShowCHinese(90,6,5);//屏
-		OLED_ShowCHinese(108,6,6);//幕
+
 	
 }
 
@@ -60,17 +57,8 @@ void meau()//主界面
 void voltage1()//ADC界面不刷新的
 {
 		OLED_Clear();
-		OLED_ShowCHinese(0,2,10);//电
-		OLED_ShowCHinese(18,2,11);//压
-		OLED_ShowCHinese(0,4,10);//电
-		OLED_ShowCHinese(18,4,12);//流
 		
-		OLED_ShowChar(37,2,':');
-		OLED_ShowChar(37,4,':');
-		OLED_ShowChar(71,2,'.');
-		OLED_ShowChar(71,4,'.');
-		OLED_ShowChar(112,2,'V');
-		OLED_ShowChar(112,4,'A');	
+
 }
 int main(void)
  {	
@@ -78,6 +66,8 @@ int main(void)
 	 	u16 len;	
 		u16 times=0;
 	  u16 t; 
+		u16 led0pwmval=0;
+		u8 dir=1;	
 	 
 		delay_init();	    	 //延时函数初始化	  
 		NVIC_Configuration(); 	 //设置NVIC中断分组2:2位抢占优先级，2位响应优先级 	
@@ -85,7 +75,7 @@ int main(void)
 //		KEY_Init();          //初始化与按键连接的硬件接口
 	 	uart_init(115200);	 //串口初始化为115200
 		EXTIX_Init();
-		
+		TIM3_PWM_Init(899,0);	 //不分频。PWM频率=72000000/900=80Khz
 	 
 	while(1) 
 	{		
@@ -114,6 +104,13 @@ int main(void)
 				flag--;
 			}
 			
+			delay_ms(10);	 
+			if(dir)led0pwmval++;
+			else led0pwmval--;
+
+			if(led0pwmval>300)dir=0;
+			if(led0pwmval==0)dir=1;										 
+			TIM_SetCompare2(TIM3,led0pwmval);	
 			
 			
 		}	
@@ -125,29 +122,28 @@ int main(void)
 				voltage1();
 				flag--;
 			}
-				if(USART_RX_STA&0x8000)
-		{					   
-			len=USART_RX_STA&0x3fff;//得到此次接收到的数据长度
-			printf("\r\n您发送的消息为:\r\n\r\n");
-			for(t=0;t<len;t++)
+			if(USART_RX_STA&0x8000)
+			{					   
+				len=USART_RX_STA&0x3fff;//得到此次接收到的数据长度
+				printf("\r\n您发送的消息为:\r\n\r\n");
+				for(t=0;t<len;t++)
+				{
+					USART_SendData(USART1, USART_RX_BUF[t]);//向串口1发送数据
+					while(USART_GetFlagStatus(USART1,USART_FLAG_TC)!=SET);//等待发送结束
+				}
+				printf("\r\n\r\n");//插入换行
+				USART_RX_STA=0;
+			}else
 			{
-				USART_SendData(USART1, USART_RX_BUF[t]);//向串口1发送数据
-				while(USART_GetFlagStatus(USART1,USART_FLAG_TC)!=SET);//等待发送结束
+				times++;
+				if(times%5000==0)
+				{
+					printf("\r\n战舰STM32开发板 串口实验\r\n");
+					printf("正点原子@ALIENTEK\r\n\r\n");
+				}
+				if(times%200==0)printf("请输入数据,以回车键结束\n");  
+				delay_ms(10);   
 			}
-			printf("\r\n\r\n");//插入换行
-			USART_RX_STA=0;
-		}else
-		{
-			times++;
-			if(times%5000==0)
-			{
-				printf("\r\n战舰STM32开发板 串口实验\r\n");
-				printf("正点原子@ALIENTEK\r\n\r\n");
-			}
-			if(times%200==0)printf("请输入数据,以回车键结束\n");  
-//			if(times%30==0)LED0=!LED0;//闪烁LED,提示系统正在运行.
-			delay_ms(10);   
-		}
 			
 			
 		}	
