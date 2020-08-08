@@ -66,8 +66,6 @@ int main(void)
 	 	u16 len;	
 		u16 times=0;
 	  u16 t; 
-		u16 led0pwmval=0;
-		u8 dir=1;	
 	 
 		delay_init();	    	 //延时函数初始化	  
 		NVIC_Configuration(); 	 //设置NVIC中断分组2:2位抢占优先级，2位响应优先级 	
@@ -75,7 +73,7 @@ int main(void)
 //		KEY_Init();          //初始化与按键连接的硬件接口
 	 	uart_init(115200);	 //串口初始化为115200
 		EXTIX_Init();
-		TIM3_PWM_Init(899,0);	 //不分频。PWM频率=72000000/900=80Khz
+		TIM3_PWM_Init(1000 - 1,72 - 1);	 //不分频。PWM频率=72000000/900=80Khz------new 72000000/72 = 1000000/1000 = 1khz(1ms)计数到1000就是1ms
 	 
 	while(1) 
 	{		
@@ -105,12 +103,8 @@ int main(void)
 			}
 			
 			delay_ms(10);	 
-			if(dir)led0pwmval++;
-			else led0pwmval--;
-
-			if(led0pwmval>300)dir=0;
-			if(led0pwmval==0)dir=1;										 
-			TIM_SetCompare2(TIM3,led0pwmval);	
+											 
+			TIM_SetCompare2(TIM3,500);	//占空比为50% 500/1000 = 50%
 			
 			
 		}	

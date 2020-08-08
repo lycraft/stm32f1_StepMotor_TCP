@@ -78,7 +78,7 @@ void TIM3_PWM_Init(u16 arr,u16 psc)
  
    //设置该引脚为复用输出功能,输出TIM3 CH2的PWM脉冲波形	GPIOB.5
 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_5; //TIM_CH2
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;  //复用推挽输出
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_OD;  //复用开漏输出
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
 	GPIO_Init(GPIOB, &GPIO_InitStructure);//初始化GPIO
  
