@@ -24,18 +24,18 @@
 
 int sa=0,sb=0,sc=0,sd=0;
 uint8_t modetemp = 6,mode = 4;//modetemp是指示位置 指向选中的mode，==============mode0-4
-uint8_t flag = 1;
+uint8_t flag = 1, motorflag = 0;
 
 
 void measure1()//mode1屏幕不刷新的东西
 {
 		OLED_Clear();
 	
-		OLED_ShowString(0,2,"PWM1:");
+		OLED_ShowString(0,2,"PWM:");
 		OLED_ShowString(41,2,"100");
 		OLED_ShowString(73,2,"hz");
 	
-		OLED_ShowString(0,4,"PWM2:");
+		OLED_ShowString(0,4,"DIR+");
 		OLED_ShowString(41,4,"1.1k");
 		OLED_ShowString(73,4,"hz");
 	 
@@ -103,9 +103,9 @@ int main(void)
 			}
 			
 			delay_ms(10);	 
-											 
-			TIM_SetCompare2(TIM3,500);	//占空比为50% 500/1000 = 50%
-			
+			if(motorflag == 1)	TIM_SetCompare2(TIM3,500);	//占空比为50% 500/1000 = 50%	//PB5接驱动PUL引脚输出PWM波！
+			GPIO_SetBits(GPIOB,GPIO_Pin_6); //拉高引脚PB6
+//			GPIO_ResetBits(GPIOB,GPIO_Pin_6);//拉低引脚PB6
 			
 		}	
 //========================================================================电压电流测量ADC
