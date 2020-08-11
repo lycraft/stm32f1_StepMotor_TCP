@@ -21,10 +21,9 @@
 #include "exti.h" 
 #include "usart.h"
 #include "timer.h"
+#include "led.h"
 
-int sa=0,sb=0,sc=0,sd=0;
-uint8_t modetemp = 6,mode = 4;//modetemp是指示位置 指向选中的mode，==============mode0-4
-uint8_t flag = 1, motorflag = 0;
+uint8_t PulForward = 0, DirForward = 0, PulBack = 0, DirBack = 0;
 
 
 void measure1()//mode1屏幕不刷新的东西
@@ -32,34 +31,13 @@ void measure1()//mode1屏幕不刷新的东西
 		OLED_Clear();
 	
 		OLED_ShowString(0,2,"PWM:");
-		OLED_ShowString(41,2,"100");
+		OLED_ShowString(41,2,"----");
 		OLED_ShowString(73,2,"hz");
 	
-		OLED_ShowString(0,4,"DIR+");
-		OLED_ShowString(41,4,"1.1k");
-		OLED_ShowString(73,4,"hz");
-	 
-
-	
+		OLED_ShowString(0,4,"DIR+:");
+		OLED_ShowString(49,4,"x");
 }
 
-void meau()//主界面
-{
-		OLED_Clear();
-		OLED_DrawBMP(96,0,128,2,BMP2);	
-		OLED_ShowString(0,6,"Meau");
-		OLED_ShowString(40,0,"PWM");
-		OLED_ShowString(40,2,"USART");
-		OLED_ShowString(40,4,"others");
-		OLED_ShowString(72,6,"Lycraft");
-}
-
-void voltage1()//ADC界面不刷新的
-{
-		OLED_Clear();
-		
-
-}
 int main(void)
  {	
 		vu8 key=0;
@@ -73,54 +51,51 @@ int main(void)
 //		KEY_Init();          //初始化与按键连接的硬件接口
 	 	uart_init(115200);	 //串口初始化为115200
 		EXTIX_Init();
-		TIM3_PWM_Init(1000 - 1,72 - 1);	 //不分频。PWM频率=72000000/900=80Khz------new 72000000/72 = 1000000/1000 = 1khz(1ms)计数到1000就是1ms
+		TIM3_PWM_Init(1000 - 1,72 - 1);	 //new 72000000/72 = 1000000/1000 = 1khz(1ms)计数到1000就是1ms
+		LED_Init();
 	 
+		measure1();
 	while(1) 
 	{		
-		if(modetemp == 3||modetemp == 9)//======箭头标志位
-		{
-			modetemp = 6;
-		}
-//========================================================================Meau
-		if(mode % 4 == 0)
-		{
-			if(flag == 1)//只执行一次的
+		
+//========================================================================按键步进电机控制方向速度
+			if(PulForward == 1)
 			{
-				meau();	
-				flag--;				
-			}
-			OLED_ShowChar(32,(modetemp % 3) * 2,'>');
-			OLED_ShowChar(32,(modetemp - 1) % 3 * 2,' ');
-			OLED_ShowChar(32,(modetemp + 1) % 3 * 2,' ');
-		}
-//========================================================================PWM
-		if(mode % 4 == 1)
-		{
-			if(flag == 1)//只执行一次的
+				delay_ms(10);	 
+				TIM_SetCompare2(TIM3,500);	//占空比为50% 500/1000 = 50%	//PB5接驱动PUL引脚输出PWM波！
+				OLED_ShowString(41,2,"1000");
+				PulForward--;
+			}				
+			if(PulBack == 1)
 			{
-				measure1();
-				flag--;
-			}
-			
-			delay_ms(10);	 
-			if(motorflag == 1)	TIM_SetCompare2(TIM3,500);	//占空比为50% 500/1000 = 50%	//PB5接驱动PUL引脚输出PWM波！
-			GPIO_SetBits(GPIOB,GPIO_Pin_6); //拉高引脚PB6
-//			GPIO_ResetBits(GPIOB,GPIO_Pin_6);//拉低引脚PB6
-			
-		}	
-//========================================================================电压电流测量ADC
-		if(mode % 4 == 2)
-		{
-			if(flag == 1)//只执行一次的
+				delay_ms(10);
+				TIM_SetCompare2(TIM3,1000);	//停止输出pwm波，该引脚变为低电平
+				OLED_ShowString(41,2,"----");
+//				TIM_PrescalerConfig(TIM3,5000,TIM_PSCReloadMode_Immediate);//修改psr以修改占空比
+				PulBack--;
+			}				
+			if(DirForward == 1)
 			{
-				voltage1();
-				flag--;
+				delay_ms(10);
+			  GPIO_SetBits(GPIOB,GPIO_Pin_6); //拉高引脚PB6	
+//				GPIOB->BRR=GPIO_Pin_6;
+				OLED_ShowString(49,4,"+");
+				DirForward--;
 			}
-			if(USART_RX_STA&0x8000)
+			if(DirBack == 1)
+			{
+				delay_ms(10);
+				GPIO_ResetBits(GPIOB,GPIO_Pin_6);//拉低引脚PB6
+//				GPIOB->BSRR=GPIO_Pin_6;
+				OLED_ShowString(49,4,"-");
+				DirBack--;
+			}
+//========================================================================串口	
+			if(USART_RX_STA&0x8000)//收到信息时
 			{					   
 				len=USART_RX_STA&0x3fff;//得到此次接收到的数据长度
 				printf("\r\n您发送的消息为:\r\n\r\n");
-				for(t=0;t<len;t++)
+				for(t=0;t<len;t++)//打印出接收的消息
 				{
 					USART_SendData(USART1, USART_RX_BUF[t]);//向串口1发送数据
 					while(USART_GetFlagStatus(USART1,USART_FLAG_TC)!=SET);//等待发送结束
@@ -130,29 +105,11 @@ int main(void)
 			}else
 			{
 				times++;
-				if(times%5000==0)
-				{
-					printf("\r\n战舰STM32开发板 串口实验\r\n");
-					printf("正点原子@ALIENTEK\r\n\r\n");
-				}
 				if(times%200==0)printf("请输入数据,以回车键结束\n");  
 				delay_ms(10);   
 			}
-			
-			
-		}	
-//=========================================================================others
-			if(mode % 4 == 3)
-		{
-			if(flag == 1)//只执行一次的
-			{
-				OLED_Clear();
-				flag--;				
-			}
-			OLED_DrawBMP(0,0,128,8,BMP1);
-			delay_ms(100);
-		
-		}
+	
+
 	}	  
 }
 
