@@ -26,7 +26,7 @@
 #include "esp8266.h"
 
 uint8_t PulForward = 0, DirForward = 0, PulBack = 0, DirBack = 0;
-
+u8 RevData = 0;
 
 void measure1()//mode1屏幕不刷新的东西
 {
@@ -42,22 +42,52 @@ void measure1()//mode1屏幕不刷新的东西
 
 int main(void)
  {	
+//////////////////////////////////////////////////////////////////////////////////*	 
+//初始化变量 
+//	 
+//////////////////////////////////////////////////////////////////////////////////  
 		vu8 key=0;
-	 	u16 len;	
-		u16 times=0;
-	  u16 t; 
-	 
+	 	uint8_t res;
+	  char str[100]={0};
+		
+//////////////////////////////////////////////////////////////////////////////////	 
+//初始化函数	  
+//////////////////////////////////////////////////////////////////////////////////  	 
 		delay_init();	    	 //延时函数初始化	  
 		NVIC_Configuration(); 	 //设置NVIC中断分组2:2位抢占优先级，2位响应优先级 	
 		OLED_Init();			//初始化OLED  
 //		KEY_Init();          //初始化与按键连接的硬件接口
-//	 	uart_init(115200);	 //串口初始化为115200
+	 	uart_init(115200);	 //串口初始化为115200
 	  ESP8266_Init(115200);
 		EXTIX_Init();
 		TIM3_PWM_Init(1000 - 1,72 - 1);	 //new 72000000/72 = 1000000/1000 = 1khz(1ms)计数到1000就是1ms
 		LED_Init();
-	 
+
+//////////////////////////////////////////////////////////////////////////////////	 
+//只执行一次的函数  
+////////////////////////////////////////////////////////////////////////////////// 		
 		measure1();
+	 
+		OLED_ShowString(0,0, "configing_0");	
+    ESP8266_AT_Test();
+		OLED_ShowString(0,0, "configing_1");	 
+		printf("正在配置ESP8266\r\n");
+    ESP8266_Net_Mode_Choose(STA);
+		OLED_ShowString(0,0, "configing_2");
+    while(!ESP8266_JoinAP(User_ESP8266_SSID, User_ESP8266_PWD));
+		OLED_ShowString(0,0, "configing_3");
+    ESP8266_Enable_MultipleId ( DISABLE );
+		OLED_ShowString(0,0, "configing_4");
+    while(!ESP8266_Link_Server(enumTCP, User_ESP8266_TCPServer_IP, User_ESP8266_TCPServer_PORT, Single_ID_0));
+		OLED_ShowString(0,0, "configing_5");
+    while(!ESP8266_UnvarnishSend());
+		OLED_ShowString(0,0, "configing_6");
+		printf("\r\n配置完成");
+		OLED_ShowString(0,0, "config is ok!");	
+		
+//////////////////////////////////////////////////////////////////////////////////	 
+//一直循环的函数 
+////////////////////////////////////////////////////////////////////////////////// 			
 	while(1) 
 	{		
 		
@@ -93,26 +123,71 @@ int main(void)
 				OLED_ShowString(49,4,"-");
 				DirBack--;
 			}
-//========================================================================串口	
-			if(USART_RX_STA&0x8000)//收到信息时
-			{					   
-				len=USART_RX_STA&0x3fff;//得到此次接收到的数据长度
-				printf("\r\n您发送的消息为:\r\n\r\n");
-				for(t=0;t<len;t++)//打印出接收的消息
-				{
-					USART_SendData(USART1, USART_RX_BUF[t]);//向串口1发送数据
-					while(USART_GetFlagStatus(USART1,USART_FLAG_TC)!=SET);//等待发送结束
-				}
-				printf("\r\n\r\n");//插入换行
-				USART_RX_STA=0;
-			}else
-			{
-				times++;
-				if(times%200==0)printf("请输入数据,以回车键结束\n");  
-				delay_ms(10);   
-			}
+//========================================================================串口	 
+      		if(RevData == 'a')
+					{
+						OLED_ShowString(49,4,"a");
+						sprintf (str,"a电机方向向左设置完成\r\n" );//格式化发送字符串到TCP服务器
+						ESP8266_SendString ( ENABLE, str, 0, Single_ID_0 );
+						DirForward = 1;
+						RevData = 0;
+					}
+					else if(RevData == 'b')
+					{
+						OLED_ShowString(49,4,"b");
+						sprintf (str,"b电机方向向右设置完成\r\n" );//格式化发送字符串到TCP服务器
+						ESP8266_SendString ( ENABLE, str, 0, Single_ID_0 );
+						DirBack = 1;
+						RevData = 0;
+					}
+					else if(RevData == 'c')
+					{
+						OLED_ShowString(49,4,"c");
+						sprintf (str,"c电机启动\r\n" );//格式化发送字符串到TCP服务器
+						ESP8266_SendString ( ENABLE, str, 0, Single_ID_0 );
+						PulForward = 1;
+						RevData = 0;
+					}
+					else if(RevData == 'd')
+					{
+						OLED_ShowString(49,4,"d");
+						sprintf (str,"d电机停止\r\n" );//格式化发送字符串到TCP服务器
+						ESP8266_SendString ( ENABLE, str, 0, Single_ID_0 );
+						PulBack = 1;
+						RevData = 0;
+					}
+					else
+					{
+						if(RevData != 0)
+						{
+							OLED_ShowString(49,4,"?");
+							sprintf (str,"不是正确指令\r\n" );//格式化发送字符串到TCP服务器
+							ESP8266_SendString ( ENABLE, str, 0, Single_ID_0 );
+							RevData = 0;
+						}
+					}
+						  
+				delay_ms(10);
 			
-//				ESP8266_STA_TCPClient_Test();
+        if(TcpClosedFlag) //判断是否失去连接
+        {
+            ESP8266_ExitUnvarnishSend(); //退出透传模式
+            do
+            {
+                res = ESP8266_Get_LinkStatus();     //获取连接状态
+            }   
+            while(!res);
+
+            if(res == 4)                     //确认失去连接，重连
+            {
+                
+                
+                while (!ESP8266_JoinAP(User_ESP8266_SSID, User_ESP8266_PWD ) );
+                while (!ESP8266_Link_Server(enumTCP, User_ESP8266_TCPServer_IP, User_ESP8266_TCPServer_PORT, Single_ID_0 ) );        
+            } 
+            while(!ESP8266_UnvarnishSend());                    
+        }
+				
 
 	}	  
 }

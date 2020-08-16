@@ -6,6 +6,7 @@
 
 
 struct STRUCT_USART_Fram ESP8266_Fram_Record_Struct = { 0 };  //定义了一个数据帧结构体
+
 void ESP8266_Init(u32 bound)
 {
     GPIO_InitTypeDef GPIO_InitStructure;
@@ -20,7 +21,7 @@ void ESP8266_Init(u32 bound)
     GPIO_InitStructure.GPIO_Pin = ESP8266_CH_PD_Pin;               
     GPIO_Init(ESP8266_CH_PD_Pin_Port, &GPIO_InitStructure);
 
-    uart_init(bound); 
+    uart2_Init(bound); 
 	  ESP8266_Rst();
 }
 //对ESP8266模块发送AT指令
