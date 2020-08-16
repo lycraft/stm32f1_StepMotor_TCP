@@ -171,6 +171,7 @@ int main(void)
 			
         if(TcpClosedFlag) //判断是否失去连接
         {
+					PulBack = 1;//断网保护，当检查到tcp没有连接时电机停止工作。
             ESP8266_ExitUnvarnishSend(); //退出透传模式
             do
             {
