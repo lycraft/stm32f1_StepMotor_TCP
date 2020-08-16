@@ -22,6 +22,8 @@
 #include "usart.h"
 #include "timer.h"
 #include "led.h"
+#include "tcp.h"
+#include "esp8266.h"
 
 uint8_t PulForward = 0, DirForward = 0, PulBack = 0, DirBack = 0;
 
@@ -49,7 +51,8 @@ int main(void)
 		NVIC_Configuration(); 	 //设置NVIC中断分组2:2位抢占优先级，2位响应优先级 	
 		OLED_Init();			//初始化OLED  
 //		KEY_Init();          //初始化与按键连接的硬件接口
-	 	uart_init(115200);	 //串口初始化为115200
+//	 	uart_init(115200);	 //串口初始化为115200
+	  ESP8266_Init(115200);
 		EXTIX_Init();
 		TIM3_PWM_Init(1000 - 1,72 - 1);	 //new 72000000/72 = 1000000/1000 = 1khz(1ms)计数到1000就是1ms
 		LED_Init();
@@ -108,7 +111,8 @@ int main(void)
 				if(times%200==0)printf("请输入数据,以回车键结束\n");  
 				delay_ms(10);   
 			}
-	
+			
+//				ESP8266_STA_TCPClient_Test();
 
 	}	  
 }
