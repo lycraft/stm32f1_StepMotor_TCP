@@ -68,22 +68,22 @@ int main(void)
 ////////////////////////////////////////////////////////////////////////////////// 		
 		measure1();
 	 
-		OLED_ShowString(0,0, "configing_0");	
+			OLED_ShowString(0,0, "configing_0");	
     ESP8266_AT_Test();
-		OLED_ShowString(0,0, "configing_1");	 
+			OLED_ShowString(0,0, "configing_1");	 
 		printf("正在配置ESP8266\r\n");
     ESP8266_Net_Mode_Choose(STA);
-		OLED_ShowString(0,0, "configing_2");
+			OLED_ShowString(0,0, "configing_2");
     while(!ESP8266_JoinAP(User_ESP8266_SSID, User_ESP8266_PWD));
-		OLED_ShowString(0,0, "configing_3");
+			OLED_ShowString(0,0, "configing_3");
     ESP8266_Enable_MultipleId ( DISABLE );
-		OLED_ShowString(0,0, "configing_4");
+			OLED_ShowString(0,0, "configing_4");
     while(!ESP8266_Link_Server(enumTCP, User_ESP8266_TCPServer_IP, User_ESP8266_TCPServer_PORT, Single_ID_0));
-		OLED_ShowString(0,0, "configing_5");
+			OLED_ShowString(0,0, "configing_5");
     while(!ESP8266_UnvarnishSend());
-		OLED_ShowString(0,0, "configing_6");
+			OLED_ShowString(0,0, "configing_6");
 		printf("\r\n配置完成");
-		OLED_ShowString(0,0, "config is ok!");	
+			OLED_ShowString(0,0, "config is ok!");	
 		
 //////////////////////////////////////////////////////////////////////////////////	 
 //一直循环的函数 
@@ -127,7 +127,7 @@ int main(void)
       		if(RevData == 'a')
 					{
 						OLED_ShowString(49,4,"a");
-						sprintf (str,"a电机方向向左设置完成\r\n" );//格式化发送字符串到TCP服务器
+						sprintf (str,"a_Motor_DIR_Forward\r\n" );//格式化发送字符串到TCP服务器
 						ESP8266_SendString ( ENABLE, str, 0, Single_ID_0 );
 						DirForward = 1;
 						RevData = 0;
@@ -135,7 +135,7 @@ int main(void)
 					else if(RevData == 'b')
 					{
 						OLED_ShowString(49,4,"b");
-						sprintf (str,"b电机方向向右设置完成\r\n" );//格式化发送字符串到TCP服务器
+						sprintf (str,"b_Motor_DIR_Back\r\n" );//格式化发送字符串到TCP服务器
 						ESP8266_SendString ( ENABLE, str, 0, Single_ID_0 );
 						DirBack = 1;
 						RevData = 0;
@@ -143,7 +143,7 @@ int main(void)
 					else if(RevData == 'c')
 					{
 						OLED_ShowString(49,4,"c");
-						sprintf (str,"c电机启动\r\n" );//格式化发送字符串到TCP服务器
+						sprintf (str,"c_Motor_Go\r\n" );//格式化发送字符串到TCP服务器
 						ESP8266_SendString ( ENABLE, str, 0, Single_ID_0 );
 						PulForward = 1;
 						RevData = 0;
@@ -151,7 +151,7 @@ int main(void)
 					else if(RevData == 'd')
 					{
 						OLED_ShowString(49,4,"d");
-						sprintf (str,"d电机停止\r\n" );//格式化发送字符串到TCP服务器
+						sprintf (str,"d_Motor_Stop\r\n" );//格式化发送字符串到TCP服务器
 						ESP8266_SendString ( ENABLE, str, 0, Single_ID_0 );
 						PulBack = 1;
 						RevData = 0;
@@ -161,14 +161,15 @@ int main(void)
 						if(RevData != 0)
 						{
 							OLED_ShowString(49,4,"?");
-							sprintf (str,"不是正确指令\r\n" );//格式化发送字符串到TCP服务器
+							sprintf (str,"cant identified\r\n" );//格式化发送字符串到TCP服务器
 							ESP8266_SendString ( ENABLE, str, 0, Single_ID_0 );
 							RevData = 0;
 						}
 					}
 						  
-				delay_ms(10);
-			
+				delay_ms(1000);
+				sprintf (str,"A030B021C047\r\n" );//格式化发送字符串到TCP服务器
+						ESP8266_SendString ( ENABLE, str, 0, Single_ID_0 );
         if(TcpClosedFlag) //判断是否失去连接
         {
 					PulBack = 1;//断网保护，当检查到tcp没有连接时电机停止工作。
