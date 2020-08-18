@@ -1,0 +1,17 @@
+T24A0 005:626.254   SEGGER J-Link V6.70e Log File
+T24A0 005:626.554   DLL Compiled: Apr 17 2020 17:55:05
+T24A0 005:626.623   Logging started @ 2020-08-18 08:50
+T24A0 005:626.710 JLINK_SetWarnOutHandler(...)
+T24A0 005:626.786 - 0.110ms
+T24A0 005:626.865 JLINK_OpenEx(...)
+T24A0 005:629.254   
+  ***** Error: 
+T24A0 005:629.417   Cannot connect to J-Link.
+T24A0 005:767.473 - 140.705ms returns "Cannot connect to J-Link."
+T24A0 005:769.460 
+  ***** 
+T24A0 005:769.626 API Error: API JLINK_GetHardwareVersion function called before JLINKARM_Open()
+T24A0 006:662.718 JLINK_Close()
+T24A0 006:663.263 - 0.606ms
+T24A0 006:663.357   
+T24A0 006:663.420   Closed
