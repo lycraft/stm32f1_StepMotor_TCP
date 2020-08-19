@@ -13,6 +13,9 @@
 #define User_ESP8266_TCPServer_IP     "59.110.70.93"     //服务器IP
 #define User_ESP8266_TCPServer_PORT   "8090"      //服务器端口号
 
+//#define User_ESP8266_TCPServer_IP     "192.168.31.194"     //服务器IP
+//#define User_ESP8266_TCPServer_PORT   "6000"      //服务器端口号
+
 
 extern volatile uint8_t TcpClosedFlag;  //连接状态标志
 
