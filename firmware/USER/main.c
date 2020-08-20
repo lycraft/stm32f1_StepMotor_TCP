@@ -207,11 +207,11 @@ int main(void)
 //-----------------------------------------------------------------------------------------------						  
 			delay_ms(10);
 			ClkTime++;
-			if(ClkTime % 20 == 0)
-			{
-				sprintf (str,"d" );//每隔0.2s给服务器发个消息
-				ESP8266_SendString ( ENABLE, str, 0, Single_ID_0 );
-			}
+//			if(ClkTime % 20 == 0)
+//			{
+//				sprintf (str,"d" );//每隔0.2s给服务器发个消息
+//				ESP8266_SendString ( ENABLE, str, 0, Single_ID_0 );
+//			}
 			if(ClkTime % 500 == 0 && AutoMode == 1)//自动巡航模式下每隔1.5秒切换电机移动方向
 			{
 				PulForward = 1;
