@@ -212,7 +212,7 @@ int main(void)
 //				sprintf (str,"d" );//每隔0.2s给服务器发个消息
 //				ESP8266_SendString ( ENABLE, str, 0, Single_ID_0 );
 //			}
-			if(ClkTime % 500 == 0 && AutoMode == 1)//自动巡航模式下每隔1.5秒切换电机移动方向
+			if(ClkTime % 1000 == 0 && AutoMode == 1)//自动巡航模式下每隔1.5秒切换电机移动方向
 			{
 				PulForward = 1;
 				if(DirFlag == 1)//如果当前电机方向为正转
@@ -226,7 +226,7 @@ int main(void)
 					DirFlag = 1;
 				}
 			}
-			if(ClkTime == 1500)
+			if(ClkTime == 15000)
 			{
 				ClkTime = 0;
 			}
